@@ -1,59 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Accessible PDF → Learning Converter</title>
-<link rel="stylesheet" href="diabilty.css" />
+<meta charset="UTF-8">
+<title>Accessible PDF Learning Tool</title>
+<link rel="stylesheet" href="style.css">
+
+<!-- ARIA + WCAG Compliance -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 <body>
-  <header>
-    <h1 id="siteTitle">AI Accessible PDF → Learning Converter</h1>
-    <p id="tagline">Convert PDFs to readable text, audio narration, braille, and simplified versions — designed for visually & cognitively impaired learners.</p>
-  </header>
+<header>
+    <h1 tabindex="0">📄 Accessible Learning & PDF Reader</h1>
+    <p id="welcome" tabindex="0">Designed for visually impaired & cognitive learners</p>
+</header>
 
-  <nav aria-label="Main actions">
-    <button id="btnUpload" aria-label="Upload PDF (Shortcut: Shift + U)">Upload PDF</button>
-    <button id="btnRead" aria-label="Read document (Shortcut: Shift + R)">Read Aloud</button>
-    <button id="btnSimplify" aria-label="Simplify text (Shortcut: Shift + S)">Simplify</button>
-    <button id="btnBraille" aria-label="Convert to Braille">Braille</button>
-    <button id="btnDownload" aria-label="Download text">Download Text</button>
-    <button id="btnHelp" aria-label="Read shortcut commands (Shortcut: Shift + H)">Help</button>
-  </nav>
+<main>
+<!-- Upload Section -->
+<section class="box" aria-label="Upload PDF">
+    <h2 tabindex="0">🔼 Upload PDF</h2>
+    <input type="file" id="pdfFile" accept=".pdf" aria-label="Choose PDF to extract text" tabindex="0">
+    <button id="uploadBtn" onclick="uploadPDF()" tabindex="0">📤 Extract & Read</button>
+</section>
 
-  <main id="main" tabindex="-1" aria-labelledby="siteTitle">
-    <section id="uploadSection" aria-labelledby="uploadHeading">
-      <h2 id="uploadHeading">Upload</h2>
-      <p>Choose a PDF file. Scanned image PDFs may need OCR (see README).</p>
-      <input id="fileInput" type="file" accept="application/pdf,image/*" aria-label="Select PDF file" />
-      <div id="status" role="status" aria-live="polite">Ready.</div>
-    </section>
+<!-- Output Section -->
+<section class="box" aria-label="Extracted Text Output">
+    <h2 tabindex="0">📄 Extracted Text</h2>
+    <textarea id="output" rows="12" aria-label="Extracted readable text area"></textarea>
 
-    <section id="contentSection" aria-labelledby="contentHeading">
-      <h2 id="contentHeading">Extracted Text</h2>
-      <textarea id="extractedText" aria-label="Extracted text" placeholder="Extracted text will appear here" ></textarea>
+    <button onclick="downloadText()" tabindex="0">💾 Save as Text File</button>
+</section>
 
-      <div id="summaryBlock" aria-live="polite" style="display:none">
-        <h3>Easy Summary</h3>
-        <div id="summaryText" tabindex="0"></div>
-      </div>
+<!-- Cognitive Summary Section -->
+<section class="box" aria-label="Summary for easy understanding">
+    <h2 tabindex="0">🧠 Cognitive Summary</h2>
+    <button onclick="summarize()" tabindex="0">📝 Generate Summary</button>
+</section>
 
-      <div id="brailleBlock" style="display:none">
-        <h3>Braille Output (Grade 1)</h3>
-        <pre id="brailleText" aria-label="Braille output"></pre>
-      </div>
-    </section>
-  </main>
+<!-- Shortcuts Help -->
+<section class="box" aria-label="Help & Shortcut Guide">
+    <h2 tabindex="0">⚡ Accessibility Shortcuts</h2>
+    <ul tabindex="0">
+        <li>🔑 <b>Shift + U</b> → Upload & Read PDF</li>
+        <li>🔑 <b>Shift + S</b> → Cognitive Summary</li>
+        <li>🔑 <b>Shift + R</b> → Repeat Last Voice</li>
+        <li>🔑 <b>Shift + H</b> → Shortcut Help Again</li>
+        <li>🔑 <b>Shift + D</b> → Download Extracted Text</li>
+    </ul>
+</section>
 
-  <aside aria-label="Accessibility controls">
-    <button id="contrastToggle" aria-pressed="false">Toggle High Contrast</button>
-    <button id="largeTextToggle" aria-pressed="false">Toggle Large Text</button>
-  </aside>
+</main>
+<footer>
+    Built for Accessibility, WCAG 2.2 Ready ✔  
+</footer>
 
-  <footer>
-    <p>Built for accessibility. Use Shift + H to hear available shortcuts.</p>
-  </footer>
-
-<script src="disabilty.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
