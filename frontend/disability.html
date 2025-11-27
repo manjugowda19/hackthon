@@ -1,59 +1,66 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Accessible PDF Learning Tool</title>
-<link rel="stylesheet" href="style.css">
-
-<!-- ARIA + WCAG Compliance -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Accessible PDF → Learning Converter</title>
+  <link rel="stylesheet" href="diabilty.css" />
 </head>
-
 <body>
-<header>
-    <h1 tabindex="0">📄 Accessible Learning & PDF Reader</h1>
-    <p id="welcome" tabindex="0">Designed for visually impaired & cognitive learners</p>
-</header>
+  <header role="banner">
+    <h1 id="title">AI Accessible PDF → Learning Converter</h1>
+    <p id="desc">Converts PDFs into readable text, audio narration, braille and simplified content — built for visually & cognitively impaired learners.</p>
+  </header>
 
-<main>
-<!-- Upload Section -->
-<section class="box" aria-label="Upload PDF">
-    <h2 tabindex="0">🔼 Upload PDF</h2>
-    <input type="file" id="pdfFile" accept=".pdf" aria-label="Choose PDF to extract text" tabindex="0">
-    <button id="uploadBtn" onclick="uploadPDF()" tabindex="0">📤 Extract & Read</button>
-</section>
+  <nav aria-label="Primary actions">
+    <button id="helpBtn" aria-label="Read help and shortcuts (Shift+H)">❓ Help</button>
+    <button id="voiceBtn" aria-label="Toggle voice control">🎤 Voice Control</button>
+    <label for="fileInput" class="fileLabel" id="fileLabel">📁 Select PDF (Shift+U)</label>
+    <input id="fileInput" type="file" accept="application/pdf,image/*" aria-label="Select PDF or image file" />
+  </nav>
 
-<!-- Output Section -->
-<section class="box" aria-label="Extracted Text Output">
-    <h2 tabindex="0">📄 Extracted Text</h2>
-    <textarea id="output" rows="12" aria-label="Extracted readable text area"></textarea>
+  <main id="main" role="main" tabindex="-1" aria-labelledby="title">
+    <section aria-labelledby="uploadHeading" id="uploadSection" class="panel">
+      <h2 id="uploadHeading">Upload</h2>
+      <p>Upload a PDF (text PDF preferred). For scanned pages, OCR will run in-browser automatically (Tesseract).</p>
+      <div id="status" role="status" aria-live="polite">Ready.</div>
+      <div class="actions">
+        <button id="extractBtn" aria-label="Extract text and read (Shift+U)">Extract & Read</button>
+        <button id="readBtn" aria-label="Read aloud (Shift+R)">Read Aloud</button>
+        <button id="simplifyBtn" aria-label="Simplify text (Shift+S)">Simplify</button>
+        <button id="brailleBtn" aria-label="Convert to braille (Shift+B)">Braille</button>
+        <button id="downloadBtn" aria-label="Download extracted text (Shift+D)">Download Text</button>
+      </div>
+    </section>
 
-    <button onclick="downloadText()" tabindex="0">💾 Save as Text File</button>
-</section>
+    <section aria-labelledby="contentHeading" id="contentSection" class="panel">
+      <h2 id="contentHeading">Extracted Text</h2>
+      <textarea id="extractedText" aria-label="Extracted text area" placeholder="Extracted text will appear here"></textarea>
 
-<!-- Cognitive Summary Section -->
-<section class="box" aria-label="Summary for easy understanding">
-    <h2 tabindex="0">🧠 Cognitive Summary</h2>
-    <button onclick="summarize()" tabindex="0">📝 Generate Summary</button>
-</section>
+      <div id="summaryCard" class="card" style="display:none" aria-live="polite">
+        <h3>🧠 Easy Summary</h3>
+        <div id="summaryText" tabindex="0"></div>
+      </div>
 
-<!-- Shortcuts Help -->
-<section class="box" aria-label="Help & Shortcut Guide">
-    <h2 tabindex="0">⚡ Accessibility Shortcuts</h2>
-    <ul tabindex="0">
-        <li>🔑 <b>Shift + U</b> → Upload & Read PDF</li>
-        <li>🔑 <b>Shift + S</b> → Cognitive Summary</li>
-        <li>🔑 <b>Shift + R</b> → Repeat Last Voice</li>
-        <li>🔑 <b>Shift + H</b> → Shortcut Help Again</li>
-        <li>🔑 <b>Shift + D</b> → Download Extracted Text</li>
-    </ul>
-</section>
+      <div id="brailleCard" class="card" style="display:none" aria-live="polite">
+        <h3>⠠ Braille Output (Grade-1)</h3>
+        <pre id="brailleText" aria-label="Braille output"></pre>
+      </div>
+    </section>
+  </main>
 
-</main>
-<footer>
-    Built for Accessibility, WCAG 2.2 Ready ✔  
-</footer>
+  <aside aria-label="Accessibility settings" class="settings">
+    <button id="contrastToggle" aria-pressed="false" aria-label="Toggle high contrast (Shift+P)">🌓 High Contrast</button>
+    <button id="largeTextToggle" aria-pressed="false" aria-label="Toggle large text (Shift+L)">🔠 Large Text</button>
+    <button id="repeatBtn" aria-label="Repeat last spoken message (Shift+Q)">🔁 Repeat</button>
+  </aside>
 
-<script src="script.js"></script>
+  <footer role="contentinfo">
+    <p>Follow WCAG 2.2 AA guidance: Perceivable, Operable, Understandable, Robust.</p>
+  </footer>
+
+  <!-- Tesseract for scanned pages (optional, client-side) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v4.1.1/dist/tesseract.min.js"></script>
+  <script src="disabilty.js"></script>
 </body>
 </html>

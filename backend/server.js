@@ -15,95 +15,103 @@ app.use(express.json());
 const UPLOAD_DIR = path.join(__dirname, 'uploads');
 if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR);
 
+// multer for file uploads
 const upload = multer({ dest: UPLOAD_DIR });
 
-// ---------- Upload + Extract PDF text ----------
+// ---------------- POST /upload
+// Accepts a PDF (or image). Uses pdf-parse for text-based PDFs.
+// For scanned PDFs/images you can use client-side Tesseract (frontend).
 app.post('/upload', upload.single('pdf'), async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+    if (!req.file) return res.status(400).json({ success:false, error:'No file' });
     const buffer = fs.readFileSync(req.file.path);
-    const data = await pdfParse(buffer);
-    // remove file after extraction
-    fs.unlinkSync(req.file.path);
-    res.json({ success: true, text: data.text || '' });
+    let data = {};
+    try {
+      data = await pdfParse(buffer);
+    } catch (err) {
+      // fallback: return empty text if parse fails (frontend will attempt OCR)
+      data.text = '';
+    }
+    // delete temp file
+    try { fs.unlinkSync(req.file.path); } catch(e){}
+    res.json({ success:true, text: data.text || '' });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: 'Failed to process PDF' });
+    res.status(500).json({ success:false, error:'Server error' });
   }
 });
 
-// ---------- Simplify (AI optional) ----------
+// ---------------- POST /simplify
+// Optional: If OPENAI_API_KEY is set, this uses OpenAI to simplify. Otherwise a local fallback is returned.
 app.post('/simplify', async (req, res) => {
-  const text = (req.body && req.body.text) || '';
-  if (!text) return res.status(400).json({ error: 'No text supplied' });
+  try {
+    const text = (req.body && req.body.text) || '';
+    if (!text) return res.status(400).json({ success:false, error:'No text' });
 
-  // If there's an OpenAI API key in env, use it (optional)
-  const OPENAI_KEY = process.env.OPENAI_API_KEY || '';
-  if (OPENAI_KEY) {
-    try {
-      // Using OpenAI ChatCompletions (model name may change). This code uses the REST v1 chat completions.
-      // Note: update endpoint / payload if using a different provider.
-      const prompt = `Simplify the following text for a student who needs plain, short sentences and easy words. Keep meaning intact.\n\nText:\n${text}\n\nSimplified:`;
-      const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    const key = process.env.OPENAI_API_KEY || '';
+    if (key) {
+      // Use OpenAI Chat Completions (update model name if needed)
+      const prompt = `Simplify the following text into short, plain sentences for a student who needs easy words. Keep meaning intact.\n\n${text}`;
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${OPENAI_KEY}`,
+          'Authorization': `Bearer ${key}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini', // replace with an available model if needed
+          model: 'gpt-4o-mini',
           messages: [{ role: 'user', content: prompt }],
-          max_tokens: 800,
-          temperature: 0.3
+          temperature: 0.2,
+          max_tokens: 800
         })
       });
-      const j = await resp.json();
+      const j = await response.json();
       const simplified = j?.choices?.[0]?.message?.content || '';
-      return res.json({ success: true, simplified: simplified.trim() });
-    } catch (err) {
-      console.error('OpenAI error', err);
-      // fall through to local fallback
+      return res.json({ success:true, simplified: simplified.trim() });
     }
+
+    // Local fallback: pick first 6 reasonably long sentences
+    const sentences = text.replace(/\s+/g,' ').split(/(?<=[.!?])\s+/).filter(s => s.trim().length>20);
+    const simplified = sentences.slice(0,6).join(' ');
+    res.json({ success:true, simplified });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success:false, error:'Simplify failed' });
   }
-
-  // FALLBACK simple summarizer for cognitive-friendly users (safe, local)
-  const sentences = text
-    .replace(/\s+/g, ' ')
-    .split(/[.?!]\s+/)
-    .filter(s => s.trim().length > 20);
-  const simplified = sentences.slice(0, Math.min(6, sentences.length)).map(s => s.trim() + '.').join(' ');
-  res.json({ success: true, simplified });
 });
 
-// ---------- Braille conversion (Grade-1 Unicode mapping) ----------
+// ---------------- POST /braille
+// Simple Grade-1 mapping (unicode braille) — basic support
 const brailleMap = {
-  "a":"⠁","b":"⠃","c":"⠉","d":"⠙","e":"⠑","f":"⠋","g":"⠛","h":"⠓","i":"⠊","j":"⠚",
-  "k":"⠅","l":"⠇","m":"⠍","n":"⠝","o":"⠕","p":"⠏","q":"⠟","r":"⠗","s":"⠎","t":"⠞",
-  "u":"⠥","v":"⠧","w":"⠺","x":"⠭","y":"⠽","z":"⠵",
-  "0":"⠚","1":"⠁","2":"⠃","3":"⠉","4":"⠙","5":"⠑","6":"⠋","7":"⠛","8":"⠓","9":"⠊",
-  " ":" ",",":"⠂",".":"⠲","?":"⠦","!":"⠖","'":"⠄","-":"⠤"
+  a:"⠁",b:"⠃",c:"⠉",d:"⠙",e:"⠑",f:"⠋",g:"⠛",h:"⠓",i:"⠊",j:"⠚",
+  k:"⠅",l:"⠇",m:"⠍",n:"⠝",o:"⠕",p:"⠏",q:"⠟",r:"⠗",s:"⠎",t:"⠞",
+  u:"⠥",v:"⠧",w:"⠺",x:"⠭",y:"⠽",z:"⠵",
+  "0":"⠼⠚","1":"⠼⠁","2":"⠼⠃","3":"⠼⠉","4":"⠼⠙","5":"⠼⠑","6":"⠼⠋","7":"⠼⠛","8":"⠼⠓","9":"⠼⠊",
+  " ":" ",",":"⠂",".":"⠲","?":"⠦","!":"⠖","'":"⠄","-":"⠤",":":"⠒",";":"⠆"
 };
-
-app.post('/braille', (req, res) => {
-  const text = (req.body && req.body.text) || '';
-  if (!text) return res.status(400).json({ error: 'No text' });
-  const out = text.toLowerCase().split('').map(ch => brailleMap[ch] || '').join('');
-  res.json({ success: true, braille: out });
+app.post('/braille', (req,res)=>{
+  try {
+    const text = (req.body && req.body.text) || '';
+    if (!text) return res.status(400).json({ success:false, error:'No text' });
+    const out = text.toLowerCase().split('').map(ch => brailleMap[ch] || '').join('');
+    res.json({ success:true, braille: out });
+  } catch (err) {
+    res.status(500).json({ success:false, error:'Braille failed' });
+  }
 });
 
-// ---------- Optional: download simple text file (frontend may request) ----------
-app.post('/download-text', (req, res) => {
-  const { text, filename } = req.body || {};
-  if (!text) return res.status(400).json({ error: 'No text supplied' });
-  const name = (filename && filename.replace(/[^a-zA-Z0-9.-_]/g, '')) || 'extracted.txt';
-  const tmpPath = path.join(UPLOAD_DIR, `${Date.now()}-${name}`);
-  fs.writeFileSync(tmpPath, text, 'utf8');
-  res.download(tmpPath, name, (err) => {
-    fs.unlinkSync(tmpPath);
+// ---------------- POST /download-text (returns a temp file)
+app.post('/download-text', (req,res)=>{
+  const text = (req.body && req.body.text) || '';
+  if (!text) return res.status(400).json({ success:false, error:'No text' });
+  const filename = `extracted-${Date.now()}.txt`;
+  const filepath = path.join(UPLOAD_DIR, filename);
+  fs.writeFileSync(filepath, text, 'utf8');
+  res.download(filepath, filename, (err)=>{
+    try { fs.unlinkSync(filepath); } catch(e){}
+    if (err) console.error(err);
   });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Accessible PDF backend running on http://localhost:${PORT}`);
-});
+app.listen(PORT, ()=>console.log(`Accessible PDF backend running http://localhost:${PORT}`));

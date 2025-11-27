@@ -1,40 +1,43 @@
-body { 
-    font-family: Arial, sans-serif;
-    background:#000;
-    color:#fff;
-    margin:0; padding:20px;
+:root{
+  --bg:#ffffff; --fg:#0b0b0b; --accent:#0b67ff; --focus:#ffbf47;
+  font-size:16px;
 }
-
-/* Boxes clearly visible for low vision users */
-.box{
-    border:3px solid #00ff95;
-    padding:20px;
-    margin:15px 0;
-    border-radius:8px;
-    background:#111;
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background:var(--bg); color:var(--fg); line-height:1.5; padding:1rem;
 }
-
-/* Buttons - clear colors */
-button{
-    background:#00ff95;
-    padding:12px;
-    border:none;
-    font-size:18px;
-    cursor:pointer;
-    margin:5px 0;
-    border-radius:6px;
-    font-weight:bold;
+header{ text-align:center; margin-bottom:1rem; }
+h1{ font-size:1.5rem; margin:0; color:var(--accent); }
+.panel{ background:#f6f8fb; padding:1rem; margin:1rem 0; border-radius:8px; }
+.card{ background:#fff; padding:1rem; border-radius:6px; margin-top:1rem; border:1px solid #e6eef8; }
+nav, .actions { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; margin:0.5rem 0;}
+button, .fileLabel{
+  background:var(--accent); color:#fff; border:none; padding:.6rem 0.9rem; border-radius:8px; cursor:pointer; font-weight:600;
 }
-button:focus{ outline:3px solid yellow; }
+.fileLabel{ background:#fff; color:var(--fg); border:2px dashed var(--accent); padding:.6rem 1rem; }
+button:focus, .fileLabel:focus{ outline:3px solid var(--focus); outline-offset:3px; }
+input[type=file]{ display:none; }
+textarea{ width:100%; min-height:240px; padding:1rem; font-size:1rem; border-radius:8px; border:1px solid #ccc; resize:vertical; }
+.settings{ display:flex; gap:.5rem; justify-content:center; margin:1rem 0; }
+.settings button{ background:#222; color:#fff; }
+[aria-live]{ margin-top:.5rem; font-style:italic; }
 
-/* Readable text */
-textarea{
-    width:100%;
-    font-size:18px;
-    padding:10px;
-    background:#fff;
-    color:#000;
+/* High contrast mode */
+.high-contrast{
+  --bg:#000; --fg:#fff; --accent:#ffd400; --focus:#00ff00;
 }
+.high-contrast body{ background:var(--bg); color:var(--fg); }
 
-/* Keyboard focus yellow */
-input,button,textarea:focus { outline:4px solid yellow; }
+/* Large text */
+.large-text{ font-size:1.25rem; }
+
+/* Focus ring for keyboard users */
+:focus{ outline: 4px solid var(--focus); outline-offset:3px; }
+
+/* Ensure content remains usable at 200% zoom via relative units */
+@media (max-width:700px){
+  h1{ font-size:1.25rem; }
+  nav, .actions { flex-direction:column; align-items:center; }
+}
