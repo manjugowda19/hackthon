@@ -1,53 +1,59 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Accessible PDF/Image Reader (MVP)</title>
-  <link rel="stylesheet" href="diabilty.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Accessible PDF → Learning Converter</title>
+<link rel="stylesheet" href="diabilty.css" />
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to main content</a>
-
   <header>
-    <h1 id="title">Accessible Reader — OCR + Read Aloud</h1>
-    <p id="subtitle">Upload a page (image or PDF image) to extract text and listen.</p>
+    <h1 id="siteTitle">AI Accessible PDF → Learning Converter</h1>
+    <p id="tagline">Convert PDFs to readable text, audio narration, braille, and simplified versions — designed for visually & cognitively impaired learners.</p>
   </header>
 
-  <main id="main" tabindex="-1" aria-labelledby="title">
-    <section aria-label="Upload controls" class="controls">
-      <label for="fileInput" class="file-label">Choose image or PDF (image):</label>
-      <input id="fileInput" type="file" accept="image/*,application/pdf" />
+  <nav aria-label="Main actions">
+    <button id="btnUpload" aria-label="Upload PDF (Shortcut: Shift + U)">Upload PDF</button>
+    <button id="btnRead" aria-label="Read document (Shortcut: Shift + R)">Read Aloud</button>
+    <button id="btnSimplify" aria-label="Simplify text (Shortcut: Shift + S)">Simplify</button>
+    <button id="btnBraille" aria-label="Convert to Braille">Braille</button>
+    <button id="btnDownload" aria-label="Download text">Download Text</button>
+    <button id="btnHelp" aria-label="Read shortcut commands (Shortcut: Shift + H)">Help</button>
+  </nav>
 
-      <div class="toggles">
-        <button id="largeTextBtn" aria-pressed="false">Toggle Large Text</button>
-        <button id="contrastBtn" aria-pressed="false">Toggle High Contrast</button>
-      </div>
-
-      <div class="tts-controls" aria-label="Text to speech controls">
-        <button id="readBtn">Read Aloud</button>
-        <button id="pauseBtn" disabled>Pause</button>
-        <button id="stopBtn" disabled>Stop</button>
-        <label for="rate">Speed:</label>
-        <input id="rate" type="range" min="0.5" max="2" step="0.1" value="1" />
-      </div>
-
-      <div class="status" aria-live="polite" id="status">Idle.</div>
+  <main id="main" tabindex="-1" aria-labelledby="siteTitle">
+    <section id="uploadSection" aria-labelledby="uploadHeading">
+      <h2 id="uploadHeading">Upload</h2>
+      <p>Choose a PDF file. Scanned image PDFs may need OCR (see README).</p>
+      <input id="fileInput" type="file" accept="application/pdf,image/*" aria-label="Select PDF file" />
+      <div id="status" role="status" aria-live="polite">Ready.</div>
     </section>
 
-    <section aria-label="Recognized text" class="output">
-      <h2>Extracted Text</h2>
-      <div id="extracted" tabindex="0" aria-label="Recognized document text" role="region"></div>
-      <a id="downloadLink" href="#" download="accessible_text.txt" hidden>Download extracted text</a>
+    <section id="contentSection" aria-labelledby="contentHeading">
+      <h2 id="contentHeading">Extracted Text</h2>
+      <textarea id="extractedText" aria-label="Extracted text" placeholder="Extracted text will appear here" ></textarea>
+
+      <div id="summaryBlock" aria-live="polite" style="display:none">
+        <h3>Easy Summary</h3>
+        <div id="summaryText" tabindex="0"></div>
+      </div>
+
+      <div id="brailleBlock" style="display:none">
+        <h3>Braille Output (Grade 1)</h3>
+        <pre id="brailleText" aria-label="Braille output"></pre>
+      </div>
     </section>
   </main>
 
+  <aside aria-label="Accessibility controls">
+    <button id="contrastToggle" aria-pressed="false">Toggle High Contrast</button>
+    <button id="largeTextToggle" aria-pressed="false">Toggle Large Text</button>
+  </aside>
+
   <footer>
-    <p>Built with Tesseract.js and Web Speech API • Hackathon MVP</p>
+    <p>Built for accessibility. Use Shift + H to hear available shortcuts.</p>
   </footer>
 
-  <!-- Tesseract.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v4.1.1/dist/tesseract.min.js"></script>
-  <script src="app.js"></script>
+<script src="disabilty.js"></script>
 </body>
 </html>
