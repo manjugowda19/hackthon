@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Accessible PDF/Image Reader (MVP)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header>
+    <h1 id="title">Accessible Reader — OCR + Read Aloud</h1>
+    <p id="subtitle">Upload a page (image or PDF image) to extract text and listen.</p>
+  </header>
+
+  <main id="main" tabindex="-1" aria-labelledby="title">
+    <section aria-label="Upload controls" class="controls">
+      <label for="fileInput" class="file-label">Choose image or PDF (image):</label>
+      <input id="fileInput" type="file" accept="image/*,application/pdf" />
+
+      <div class="toggles">
+        <button id="largeTextBtn" aria-pressed="false">Toggle Large Text</button>
+        <button id="contrastBtn" aria-pressed="false">Toggle High Contrast</button>
+      </div>
+
+      <div class="tts-controls" aria-label="Text to speech controls">
+        <button id="readBtn">Read Aloud</button>
+        <button id="pauseBtn" disabled>Pause</button>
+        <button id="stopBtn" disabled>Stop</button>
+        <label for="rate">Speed:</label>
+        <input id="rate" type="range" min="0.5" max="2" step="0.1" value="1" />
+      </div>
+
+      <div class="status" aria-live="polite" id="status">Idle.</div>
+    </section>
+
+    <section aria-label="Recognized text" class="output">
+      <h2>Extracted Text</h2>
+      <div id="extracted" tabindex="0" aria-label="Recognized document text" role="region"></div>
+      <a id="downloadLink" href="#" download="accessible_text.txt" hidden>Download extracted text</a>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built with Tesseract.js and Web Speech API • Hackathon MVP</p>
+  </footer>
+
+  <!-- Tesseract.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@v4.1.1/dist/tesseract.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
